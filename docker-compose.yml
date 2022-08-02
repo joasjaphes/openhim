@@ -40,19 +40,5 @@ services:
     volumes:
       - /etc/letsencrypt:/usr/share/openhim-console
 
-  afyass-mediator:
-    container_name: afyass-mediator
-    build:
-      context: ./mediators/afyass-mediator
-    depends_on:
-      - openhim-core
-
-  tulonge-mediator:
-    container_name: tulonge-mediator
-    build:
-      context: ./mediators/tulonge-mediator
-    depends_on:
-      - openhim-core
-
 volumes:
   mongo-data:
