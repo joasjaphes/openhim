@@ -1,0 +1,58 @@
+version: '3.3'
+
+#networks:
+#  default:
+#    external:
+#      name: dpod-network
+
+services:
+  mongo-db:
+    container_name: mongo-db
+    image: mongo:4.0
+    volumes:
+      - "mongo-data:/data/db"
+    restart: always
+
+  openhim-core:
+    container_name: openhim-core
+    image: jembi/openhim-core:latest
+    restart: always
+    environment:
+      mongo_url: "mongodb://mongo-db/openhim-development"
+      mongo_atnaUrl: "mongodb://mongo-db/openhim-development"
+      NODE_ENV: "development"
+    ports:
+       - "8080:8080"
+       - "5000:5000"
+       - "5001:5001"
+
+  openhim-console:
+    container_name: openhim-console
+    image: jembi/openhim-console:latest
+    restart: always
+    ports:
+       - "9000:80"
+    healthcheck:
+     test: "curl -sS http://openhim-console || exit 1"
+     interval: 30s
+     timeout: 30s
+     retries: 3
+    volumes:
+      - /etc/letsencrypt:/usr/share/openhim-console
+
+  afyass-mediator:
+    container_name: afyass-mediator
+    build:
+      context: ./mediators/afyass-mediator
+    depends_on:
+      - openhim-core
+
+  tulonge-mediator:
+    container_name: tulonge-mediator
+    build:
+      context: ./mediators/tulonge-mediator
+    depends_on:
+      - openhim-core
+
+volumes:
+  mongo-data:
